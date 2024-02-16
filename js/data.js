@@ -10,10 +10,3 @@ let finesData = [
 window.data = {
     finesData: finesData
 }
-
-
-
-
-
-
-
