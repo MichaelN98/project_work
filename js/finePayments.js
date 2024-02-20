@@ -1,46 +1,78 @@
-buttonSubmit.addEventListener('click', payFine);                                //при клике на кнопку "Оплатить штраф" вызывается функция payfine 
 
-function payFine() {                                                            //функция оплаты штрафа
-    let fineNumValue = fineNumber.value;                                        // Получение значений из полей ввода
-    let passportValue = passport.value;
-    let creditCardNumberValue = creditCardNumber.value;
-    let cvvValue = cvv.value;
-    let amountValue = parseInt(amount.value);                                   // Преобразование суммы в целое число
+"use strict";
 
-    let fineExists = DB.find(fine => fine.номер === fineNumValue);              //поиск файла в бд по номеру
-    if (!fineExists) {                                                          //существет ли такой штраф с номером
-        alert("Номер не совпадает");
+let fineNumber = document.getElementById("fineNumber");
+let passport = document.getElementById("passport");
+let creditCardNumber = document.getElementById("creditCardNumber");
+let cvv = document.getElementById("cvv");
+let amount = document.getElementById("amount");
+let buttonSubmit = document.getElementById("payFine");
+
+//Ця зміна містить всі дані які в нас зберігаються у файлі data
+let DB = data.finesData;
+
+// Регулярные выражения для проверки валидности паспортного номера, номера кредитной карты и CVV
+let passportRegex = /^[А-Я]{2}\d{6}$/;
+let creditCardNumberRegex = /^(4[0-9]{15})|(5[1-5][0-9]{14})$/;
+let cvvRegex = /^\d{3}$/;
+
+// Добавление обработчика события на кнопку
+buttonSubmit.addEventListener('click', payFine);
+
+// Функция для оплаты штрафа
+function payFine() {
+    let selectedFineIndex;
+
+    // Поиск индекса выбранного штрафа в массиве данных
+    for (let i = 0; i < DB.length; i++) {
+        const fine = DB[i];
+        if (fine.номер === fineNumber.value) {
+            selectedFineIndex = i;
+            break;
+        }
+    }
+
+    // Проверка наличия выбранного штрафа
+    if (selectedFineIndex === undefined) {
+        alert('Невірний номер штрафу');
         return;
     }
 
-    if (fineExists.сума !== amountValue) {                                      //проверка на совпадение суммы
-        alert("Сумма не совпадает");
+    // Проверка валидности паспортного номера
+    if (!passportRegex.test(passport.value)) {
+        alert('Не вірний паспортний номер');
         return;
     }
 
-    let passportPattern = /^[А-ЯҐЄІЇ]{2}\d{6}$/;                                //проверка формата паспортного номера
-    if (!passportPattern.test(passportValue)) {
-        alert("Неверный паспортный номер");
+    // Проверка валидности номера кредитной карты
+    if (!creditCardNumberRegex.test(creditCardNumber.value)) {
+        alert('Не вірна кредитна картка');
         return;
     }
 
-    let creditCardPattern = /^\d{16}$/;                                         //проверка кредитки
-    if (!creditCardPattern.test(creditCardNumberValue)) {
-        alert("Неверный номер кредитной карты");
+    // Проверка валидности CVV
+    if (!cvvRegex.test(cvv.value)) {
+        alert('Не вірний СVV');
         return;
     }
 
-    let cvvPattern = /^\d{3}$/;                                                 //проверка СVV
-    if (!cvvPattern.test(cvvValue)) {
-        alert("Неверный CVV");
+    // Проверка соответствия суммы штрафа введенной сумме
+    if (DB[selectedFineIndex].сума != amount.value) {
+        alert('Сума не вірна');
         return;
     }
 
-    let index = DB.findIndex(fine => fine.номер === fineNumValue);              // блок оплаты штрафа
-    if (index !== -1) {
-        DB.splice(index, 1);
-        alert("Оплата успешно произведена. Штраф оплачен.");
-    } else {
-        alert("Ошибка при обработке оплаты. Пожалуйста, попробуйте еще раз.");
-    }
+    // Удаление выбранного штрафа из массива данных
+    DB.splice(selectedFineIndex, 1);
+
+    // Вывод сообщения об успешной оплате
+    alert('Штраф сплачено успішно')
+
+    // Очистка полей формы
+    fineNumber.value = '';
+    passport.value = '';
+    creditCardNumber.value = '';
+    cvv.value = '';
+    amount.value = '';
 }
+

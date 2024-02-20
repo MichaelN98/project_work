@@ -1,4 +1,3 @@
-
 "use strict";
 window.fineList = {
     searchFines : searchFines
@@ -8,31 +7,29 @@ window.fineList = {
 let DB = data.finesData;
 
 function searchFines(searchKey) {
-    // Створюємо порожній масив, куди будемо додавати знайдені штрафи
-    let result = [];
+    // Вывод searchKey и DB (данные о штрафах) в консоль
+    console.log(searchKey);
+    console.log(DB);
 
-    // Перевіряємо, чи передано коректний ключ пошуку
-    if (searchKey === 'Пошук за номером') {
-        // Логіка для пошуку за номером
-        // Наприклад:
-        for (let i = 0; i < DB.length; i++) {
-            if (DB[i].номер === '001') {
-                result.push(DB[i]);
-            }
-        }
-    } else if (searchKey === 'Пошук за типом штрафу') {
-        // Логіка для пошуку за типом штрафу
-        // Наприклад:
-        for (let i = 0; i < DB.length; i++) {
-            if (DB[i].тип === 'Перевищення швидкості') {
-                result.push(DB[i]);
-            }
-        }
-    } else {
-        // Якщо переданий невідомий ключ пошуку
-        console.log('Невідомий ключ пошуку');
+    // Проверка на то, не является ли searchKey ложным значением (null, undefined, 0, false, "", и т. д.)
+    if (!searchKey) {
+        console.error("Не вказано значення для пошуку");
+        return [];
     }
 
-    // Повертаємо знайдені штрафи
-    return result;
+    // Фильтрация массива DB на основе searchKey
+    const searchResult = DB.filter(element => {
+        // Проверка, содержит ли номер штрафа или его тип searchKey
+        return element.номер.includes(searchKey) || element.тип.includes(searchKey);
+    });
+
+    // Если найдены какие-либо штрафы, возвращается результат поиска
+    if (searchResult.length > 0) {
+        return searchResult;
+    } else {
+        // Если штрафы не найдены, выводится предупреждение и возвращается пустой массив
+        alert("Штраф не знайдено");
+        return [];
+    }
 }
+
