@@ -51,3 +51,4 @@ searchFines.addEventListener('click', () => {
     let searchData = (number) ? number : fineType;
     populateFinesTable(fineList.searchFines(searchData));
 })
+
